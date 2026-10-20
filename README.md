@@ -9,10 +9,12 @@
 
 ## 何のためのリポジトリか
 
-アルゴリズムの実装集は世の中に山ほどあるので、ここでは「どう書くか」の方を揃えています。
-マイコンに持っていってもそのまま動く書き方、つまり `malloc` をしない、再帰の深さを抑える、
-バッファの大きさを呼び出し側が決める、という前提で全部書いています。
-兄弟リポジトリの [reversi-c](https://github.com/Noa-aoN/reversi-c) と同じ流儀です。
+自分のための整理と演習の場です。知っているつもりのアルゴリズムをもう一度手で書き、
+テストで確かめ、迷ったところを書き残しておきます。
+
+書き方は普段の組み込みの流儀に揃えています。`malloc` をしない、再帰を深くしない、
+バッファの大きさは呼び出し側が決める。そうしておけば、ここで書いたものをマイコンに
+持っていってもそのまま使えます。兄弟リポジトリの [reversi-c](https://github.com/Noa-aoN/reversi-c) も同じ流儀です。
 
 ## 一覧
 
@@ -60,9 +62,10 @@ MIT
 
 ## English
 
-Classic algorithms and data structures, one per file, written the way embedded C is written:
-no heap allocation, caller-provided storage, and a unit test next to every implementation.
-Same conventions as the sibling [reversi-c](https://github.com/Noa-aoN/reversi-c).
+A personal workbook: classic algorithms and data structures, each written again by hand, pinned
+down with a test, with notes on what was not obvious. The style is the embedded C I write day to
+day (no heap allocation, caller-provided storage, bounded recursion), so anything here can go to a
+microcontroller as is. Same conventions as the sibling [reversi-c](https://github.com/Noa-aoN/reversi-c).
 
 ### Index
 
