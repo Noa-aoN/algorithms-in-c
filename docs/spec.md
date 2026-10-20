@@ -2,6 +2,8 @@
 
 テーマごとの設計メモ。1 テーマ 1 項目、新しいものを下に足す。
 
+[English](#english)
+
 ## 共通方針
 
 - `qsort` 風の汎用インターフェース (`void *base, size_t n, size_t size, cmp`)。マクロなしで任意の
@@ -68,8 +70,6 @@
   ターゲットでは単一生産者 / 単一消費者でロック不要。ただしここでは証明しておらず、
   テストは単一スレッド。
 
-[English](#english)
-
 ---
 
 ## English
@@ -100,43 +100,54 @@ Per-item design notes. One short entry per item, newest at the bottom.
 
 ### merge_sort
 
-- ボトムアップ (幅 1, 2, 4, ... で隣接ランをマージ) なので再帰なし。
-- 作業領域 `scratch` (要素 n 個分) は呼び出し側が渡す。`malloc` 禁止の規則をインターフェースで表現している。
-- マージで右側を取るのは「右 < 左」のときだけ。等しければ左を先に出すので安定。
+- Bottom-up (merge adjacent runs of width 1, 2, 4, ...), so there is no recursion.
+- The scratch area (`n` elements) is passed in by the caller. The no-`malloc` rule is expressed
+  in the interface rather than hidden inside.
+- The merge takes from the right run only when right < left; on ties the left element goes
+  first, which keeps the sort stable.
 
-## quick_sort
+### quick_sort
 
-- Hoare 分割 + 中央値 3 点でピボット選択。昇順・降順・全要素同値の入力でも O(n log n) に収まる。
-- 小さい側だけ再帰し、大きい側はループで続ける。スタック深さは O(log n) に抑えられる。
-- 不安定。安定が必要なら merge_sort。
+- Hoare partition with median-of-three pivot selection. Sorted, reversed and all-equal inputs
+  stay at O(n log n).
+- Recurse on the smaller side only and loop on the larger one, which bounds the stack depth
+  at O(log n).
+- Not stable. Use merge_sort when stability matters.
 
-## heap_sort
+### heap_sort
 
-- 下から半分の節を `sift_down` して堆を作り、先頭と末尾を入れ替えながら縮める。再帰なし、追加領域なし。
-- quick_sort と違い最悪でも O(n log n)。入力に敵対的なケースがあり得る場所 (外部から来るデータ) 向け。
-- 不安定。
+- Build the heap by `sift_down` from the lower half, then shrink it while swapping the root
+  with the last element. No recursion, no extra storage.
+- Unlike quick_sort the worst case is O(n log n), which matters where the input can be
+  adversarial (data from outside).
+- Not stable.
 
-## crc32
+### crc32
 
-- 反射型 CRC-32 (多項式 0xEDB88320、初期値・最終 XOR とも 0xFFFFFFFF)。zlib / PNG / Ethernet と同じ。
-- `crc32_update` / `crc32_finish` の逐次 API で、受信バッファを分割して処理できる。
-- 256 エントリのテーブルは初回呼び出し時に生成する (ROM に置きたいときは定数配列に差し替える)。
-  初期化はスレッド安全ではないので、マルチスレッド環境では起動時に一度呼んでおく。
-- ビット単位版 `crc32_bitwise` はテーブル版の検算用で、ROM 1 KiB を節約したいときの代替にもなる。
+- Reflected CRC-32 (polynomial 0xEDB88320, initial value and final XOR both 0xFFFFFFFF), the
+  same as zlib, PNG and Ethernet.
+- `crc32_update` / `crc32_finish` form a streaming API so a receive buffer can be processed in
+  chunks.
+- The 256-entry table is generated on first use (swap in a constant array to keep it in ROM).
+  The initialisation is not thread safe, so call it once at startup in a multithreaded system.
+- `crc32_bitwise` is the bitwise variant, used to cross-check the table and as a 1 KiB ROM
+  saving alternative.
 
-## cobs
+### cobs
 
-- Consistent Overhead Byte Stuffing。フレーム中の 0x00 を取り除き、0x00 をフレームの区切りに使えるようにする。
-  UART のような区切りのないバイト列でフレームを切るための定番で、SLIP より手数が少なく、
-  オーバーヘッドは 254 バイトにつき最大 1 バイトと一定。
-- `cobs_encode` / `cobs_decode` は出力容量を受け取り、足りなければ 0 を返す。デコードは
-  コード 0x00、途中に 0x00 が混じる、長さが足りない、の各不正入力も 0 で拒否する。
-  受信側は信用できないデータを扱うので、ここだけは入口の検査を厚くしている。
-- `COBS_ENCODE_MAX(n)` は符号化後の最大長 (n が 0 なら 1、それ以外は n + ceil(n / 254))。
-  受信バッファの確保量をコンパイル時に決めるためのマクロ。
-- 254 バイト目の境界 (コード 0xFF の後ろに暗黙の 0 を入れない) はテストで両側から確認している。
+- Consistent Overhead Byte Stuffing removes every 0x00 from a frame so that 0x00 can delimit
+  frames. The usual choice for framing on a UART-style byte stream: fewer steps than SLIP and a
+  fixed overhead of at most one byte per 254.
+- `cobs_encode` / `cobs_decode` take the output capacity and return 0 when it is too small.
+  Decode also returns 0 for a zero code byte, an embedded 0x00 and a truncated block. The
+  receiver handles untrusted data, so this is the one place where input checks are deliberately
+  thorough.
+- `COBS_ENCODE_MAX(n)` is the maximum encoded length (1 for n = 0, otherwise
+  n + ceil(n / 254)), for sizing receive buffers at compile time.
+- The 254-byte boundary (no implicit zero after a 0xFF code) is tested from both sides.
 
-## ring_buffer
+### ring_buffer
+
 
 - Capacity must be a power of two so the index wrap is a mask, not a modulo.
 - `head` and `tail` are free-running counters; `count = head - tail` is well defined under

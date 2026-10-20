@@ -46,10 +46,13 @@ bit tricks、fixed-point、gcd。
 ```sh
 make test       # 全 *_test.c をビルドして実行
 make asan       # 同じテストを AddressSanitizer + UBSan で
+make cross      # arm-none-eabi-gcc で Cortex-M4 向けにコンパイルしてサイズを表示
 make clean
 ```
 
 CI は gcc / clang それぞれで通常ビルドと ASan/UBSan ビルドを回し、valgrind でも全テストを通します。
+「マイコンに持っていける」を言葉だけにしないために、Cortex-M4 (Thumb-2) 向けのビルドも CI で毎回通しています。
+全 8 テーマ合わせてコードは 1.5 KB です (`-Os`、CRC テーブルの 1 KB は RAM)。
 テストはヘッダ 1 つの自作フレームワーク (`tests/minitest.h`) です。
 
 各テーマの設計判断は [docs/spec.md](docs/spec.md) に残しています。
@@ -96,10 +99,12 @@ bit tricks, fixed-point, gcd.
 ```sh
 make test
 make asan
+make cross      # Cortex-M4 build with arm-none-eabi-gcc, prints code size
 ```
 
-CI runs gcc and clang with and without ASan/UBSan, plus valgrind. Design notes per item are in
-`docs/spec.md`.
+CI runs gcc and clang with and without ASan/UBSan, plus valgrind, and a Cortex-M4 (Thumb-2)
+build so the "runs on a microcontroller" claim is checked on every push. All eight items
+together are 1.5 KB of code at `-Os`. Design notes per item are in `docs/spec.md`.
 
 ### License
 
