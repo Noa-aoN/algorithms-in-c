@@ -21,6 +21,26 @@
   重複時に最左を返すので `find` の結果が決定的。
 - `mid = lo + (hi - lo) / 2` で `(lo + hi) / 2` のオーバーフローを避ける。
 
+## merge_sort
+
+- ボトムアップ (幅 1, 2, 4, ... で隣接ランをマージ) なので再帰なし。
+- 作業領域 `scratch` (要素 n 個分) は呼び出し側が渡す。`malloc` 禁止の規則をインターフェースで表現している。
+- マージで右側を取るのは「右 < 左」のときだけ。等しければ左を先に出すので安定。
+
+## quick_sort
+
+- Hoare 分割 + 中央値 3 点でピボット選択。昇順・降順・全要素同値の入力でも O(n log n) に収まる。
+- 小さい側だけ再帰し、大きい側はループで続ける。スタック深さは O(log n) に抑えられる。
+- 不安定。安定が必要なら merge_sort。
+
+## crc32
+
+- 反射型 CRC-32 (多項式 0xEDB88320、初期値・最終 XOR とも 0xFFFFFFFF)。zlib / PNG / Ethernet と同じ。
+- `crc32_update` / `crc32_finish` の逐次 API で、受信バッファを分割して処理できる。
+- 256 エントリのテーブルは初回呼び出し時に生成する (ROM に置きたいときは定数配列に差し替える)。
+  初期化はスレッド安全ではないので、マルチスレッド環境では起動時に一度呼んでおく。
+- ビット単位版 `crc32_bitwise` はテーブル版の検算用で、ROM 1 KiB を節約したいときの代替にもなる。
+
 ## ring_buffer
 
 - 容量は 2 の冪に限定し、添字の折り返しを剰余ではなくマスクで行う。
@@ -60,7 +80,27 @@ Per-item design notes. One short entry per item, newest at the bottom.
   check. Returning the leftmost match makes `find` deterministic on duplicates.
 - `mid = lo + (hi - lo) / 2` avoids the overflow in `(lo + hi) / 2`.
 
-### ring_buffer
+### merge_sort
+
+- ボトムアップ (幅 1, 2, 4, ... で隣接ランをマージ) なので再帰なし。
+- 作業領域 `scratch` (要素 n 個分) は呼び出し側が渡す。`malloc` 禁止の規則をインターフェースで表現している。
+- マージで右側を取るのは「右 < 左」のときだけ。等しければ左を先に出すので安定。
+
+## quick_sort
+
+- Hoare 分割 + 中央値 3 点でピボット選択。昇順・降順・全要素同値の入力でも O(n log n) に収まる。
+- 小さい側だけ再帰し、大きい側はループで続ける。スタック深さは O(log n) に抑えられる。
+- 不安定。安定が必要なら merge_sort。
+
+## crc32
+
+- 反射型 CRC-32 (多項式 0xEDB88320、初期値・最終 XOR とも 0xFFFFFFFF)。zlib / PNG / Ethernet と同じ。
+- `crc32_update` / `crc32_finish` の逐次 API で、受信バッファを分割して処理できる。
+- 256 エントリのテーブルは初回呼び出し時に生成する (ROM に置きたいときは定数配列に差し替える)。
+  初期化はスレッド安全ではないので、マルチスレッド環境では起動時に一度呼んでおく。
+- ビット単位版 `crc32_bitwise` はテーブル版の検算用で、ROM 1 KiB を節約したいときの代替にもなる。
+
+## ring_buffer
 
 - Capacity must be a power of two so the index wrap is a mask, not a modulo.
 - `head` and `tail` are free-running counters; `count = head - tail` is well defined under
