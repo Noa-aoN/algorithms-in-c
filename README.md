@@ -12,13 +12,16 @@ C11、ヒープ確保なし、ストレージは呼び出し側が渡す、実�
 | 分野 | 項目 | 計算量 | 備考 | 状態 |
 |---|---|---|---|---|
 | sorting | [insertion_sort](sorting/insertion_sort.c) | 時間 O(n^2)、空間 O(1) | 汎用、安定、in place | 済 |
+| sorting | [merge_sort](sorting/merge_sort.c) | 時間 O(n log n)、空間 O(n) | ボトムアップ、安定、作業領域は呼び出し側が渡す | 済 |
+| sorting | [quick_sort](sorting/quick_sort.c) | 平均 O(n log n)、スタック O(log n) | Hoare 分割、中央値 3 点、小さい側だけ再帰 | 済 |
 | searching | [binary_search](searching/binary_search.c) | O(log n) | `lower_bound` / `upper_bound` / `find` | 済 |
 | structures | [ring_buffer](structures/ring_buffer.c) | 1 操作 O(1) | 容量は 2 の冪、フリーランカウンタ | 済 |
-| sorting | merge / quick / heap sort | | | 予定 |
+| bits | [crc32](bits/crc32.c) | O(n) | テーブル版 + ビット版、逐次更新 API、check 値 0xCBF43926 | 済 |
+| sorting | heap sort | | | 予定 |
 | structures | linked list, stack, queue, hash table, heap, BST, union-find | | | 予定 |
 | graph | BFS, DFS, Dijkstra | | | 予定 |
 | strings | KMP | | | 予定 |
-| bits | bit tricks, CRC-32 | | | 予定 |
+| bits | bit tricks | | | 予定 |
 | math | fixed-point, gcd | | | 予定 |
 
 ## ルール
@@ -56,13 +59,16 @@ C11, no heap allocation, caller-provided storage, and a unit test next to every 
 | Area | Item | Complexity | Notes | State |
 |---|---|---|---|---|
 | sorting | [insertion_sort](sorting/insertion_sort.c) | O(n^2) time, O(1) space | generic, stable, in place | done |
+| sorting | [merge_sort](sorting/merge_sort.c) | O(n log n) time, O(n) space | bottom-up, stable, caller-provided scratch | done |
+| sorting | [quick_sort](sorting/quick_sort.c) | O(n log n) average, O(log n) stack | Hoare partition, median of three, recurse on smaller side | done |
 | searching | [binary_search](searching/binary_search.c) | O(log n) | `lower_bound` / `upper_bound` / `find` | done |
 | structures | [ring_buffer](structures/ring_buffer.c) | O(1) per op | power-of-two capacity, free-running indices | done |
-| sorting | merge / quick / heap sort | | | planned |
+| bits | [crc32](bits/crc32.c) | O(n) | table and bitwise variants, streaming API, check value 0xCBF43926 | done |
+| sorting | heap sort | | | planned |
 | structures | linked list, stack, queue, hash table, heap, BST, union-find | | | planned |
 | graph | BFS, DFS, Dijkstra | | | planned |
 | strings | KMP | | | planned |
-| bits | bit tricks, CRC-32 | | | planned |
+| bits | bit tricks | | | planned |
 | math | fixed-point, gcd | | | planned |
 
 ### Rules
