@@ -85,6 +85,16 @@
   負の入力でも等式が成り立つことをテストで確認している。
 - `mod_inverse_u32` は拡張ユークリッドの x を法で正規化したもの。互いに素でなければ `false`。
 
+## bit_tricks
+
+- `__builtin_popcount` などの組み込み関数を使わない素の C。結果がコンパイラに依らないので、
+  組み込み関数を使う側の検算にも、組み込み関数のないコンパイラの代替にもなる。
+- popcount はビット並列 (2, 4, 8 ビット単位で加算し、最後に乗算で合計)。ctz は `v & -v` で最下位ビットを
+  取り出して `popcount(lsb - 1)`。clz は上位へ塗りつぶしてから popcount。
+- `bt_reverse` はマスク交換 (1, 2, 4 ビット) の後にバイト swap。`bt_next_pow2` は 32 ビットに
+  収まらないとき 0 を返す (`0x80000001` 以上)。
+- テストは各関数を 1 ビットずつ回す素朴な実装と乱数 10 万件で突き合わせる。
+
 ## ring_buffer
 
 - 容量は 2 の冪に限定し、添字の折り返しを剰余ではなくマスクで行う。
@@ -196,6 +206,17 @@ Per-item design notes. One short entry per item, newest at the bottom.
 - `gcd_ext_i64` is the extended Euclid. It returns coefficients with `a*x + b*y = g` and
   normalises g to be non-negative; the identity is tested with negative inputs too.
 - `mod_inverse_u32` reduces the x from the extended Euclid modulo m, `false` unless coprime.
+
+### bit_tricks
+
+- Plain C with no compiler builtins, so results do not depend on the toolchain; usable both as a
+  cross-check for the intrinsics and as a fallback where they do not exist.
+- popcount is the bit-parallel form (add in 2, 4, 8-bit lanes, then a multiply to sum). ctz
+  isolates the lowest bit with `v & -v` and takes `popcount(lsb - 1)`; clz smears upward and
+  counts.
+- `bt_reverse` swaps in 1, 2, 4-bit masks and then byte-swaps. `bt_next_pow2` returns 0 when
+  the result does not fit in 32 bits (input above `0x80000000`).
+- Each function is checked against a naive one-bit-at-a-time loop on 100,000 random values.
 
 ### ring_buffer
 
