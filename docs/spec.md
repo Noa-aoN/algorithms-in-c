@@ -75,6 +75,16 @@
   「厳密な有理数との誤差が 0.5 ulp 以内」という整数だけの判定で確かめています (浮動小数点を
   オラクルにしない)。
 
+## gcd
+
+- `gcd_u32` は Stein の二進 GCD。シフトと減算だけで、除算器のないコア (Cortex-M0 など) でも
+  ユークリッド法より速い。共通の 2 の冪を先にくくり出し、最後に戻す。
+- `lcm_u32` は `a / gcd * b` を 64 ビットで計算し、32 ビットに収まらなければ `false`。
+  0 を含むときは 0。
+- `gcd_ext_i64` は拡張ユークリッド。`a*x + b*y = g` の係数を返し、g は常に非負に正規化する。
+  負の入力でも等式が成り立つことをテストで確認している。
+- `mod_inverse_u32` は拡張ユークリッドの x を法で正規化したもの。互いに素でなければ `false`。
+
 ## ring_buffer
 
 - 容量は 2 の冪に限定し、添字の折り返しを剰余ではなくマスクで行う。
@@ -175,6 +185,17 @@ Per-item design notes. One short entry per item, newest at the bottom.
 - Division by zero saturates by sign. Besides known values, the tests check 20,000 random
   multiply/divide pairs against the exact rational with an integer-only "within 0.5 ulp" test,
   so floating point is never the oracle.
+
+### gcd
+
+- `gcd_u32` is Stein's binary GCD: shifts and subtractions only, so it beats Euclid on a core
+  without a hardware divider (Cortex-M0 and the like). Common powers of two are factored out
+  first and restored at the end.
+- `lcm_u32` computes `a / gcd * b` in 64 bits and returns `false` when the result does not fit
+  in 32 bits; 0 if either input is 0.
+- `gcd_ext_i64` is the extended Euclid. It returns coefficients with `a*x + b*y = g` and
+  normalises g to be non-negative; the identity is tested with negative inputs too.
+- `mod_inverse_u32` reduces the x from the extended Euclid modulo m, `false` unless coprime.
 
 ### ring_buffer
 
