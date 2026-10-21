@@ -52,6 +52,7 @@ make clean
 ```
 
 CI は gcc / clang それぞれで通常ビルドと ASan/UBSan ビルドを回し、valgrind でも全テストを通します。
+静的解析 (cppcheck と clang の scan-build) も毎回かけています。
 「マイコンに持っていける」を言葉だけにしないために、Cortex-M4 (Thumb-2) 向けのビルドも CI で毎回通しています。
 全 9 テーマ合わせてコードは 2 KB 弱です (`-Os`、CRC テーブルの 1 KB は RAM)。
 テストはヘッダ 1 つの自作フレームワーク (`tests/minitest.h`) です。
@@ -104,8 +105,8 @@ make asan
 make cross      # Cortex-M4 build with arm-none-eabi-gcc, prints code size
 ```
 
-CI runs gcc and clang with and without ASan/UBSan, plus valgrind, and a Cortex-M4 (Thumb-2)
-build so the "runs on a microcontroller" claim is checked on every push. All nine items
+CI runs gcc and clang with and without ASan/UBSan, valgrind, cppcheck and scan-build, and a
+Cortex-M4 (Thumb-2) build so the "runs on a microcontroller" claim is checked on every push. All nine items
 together are under 2 KB of code at `-Os`. Design notes per item are in `docs/spec.md`.
 
 ### License
