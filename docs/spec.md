@@ -115,6 +115,14 @@
   完全な経路圧縮と同じ償却計算量になる。併合はサイズの小さい方を大きい方の下に付ける。
 - テストは素朴なラベル配列との全組み合わせ比較と、鎖状に併合しても木が平らに保たれることの確認。
 
+## linked_list
+
+- 侵入型 (intrusive) の単方向リスト。`list_node` を要素の構造体に埋め込み、`LIST_ENTRY` で
+  ノードから要素に戻る。Linux カーネルの `list_head` と同じ発想で、リスト側は何も確保しない。
+- `remove` は「ノードへのポインタ」ではなく「リンクへのポインタ (`list_node **`)」を辿る。
+  先頭の特別扱いが消え、どの位置でも同じループになる。
+- tail を持つので `push_back` も O(1)。`reverse` は 3 ポインタの定番。
+
 ## ring_buffer
 
 - 容量は 2 の冪に限定し、添字の折り返しを剰余ではなくマスクで行う。
@@ -262,6 +270,15 @@ Per-item design notes. One short entry per item, newest at the bottom.
   the smaller tree under the larger.
 - Tests compare against a naive label array on every pair and check that a chain of unions
   still leaves a flat tree.
+
+### linked_list
+
+- Intrusive singly linked list: `list_node` is embedded in the element and `LIST_ENTRY` gets
+  back from node to element, the same idea as the Linux kernel's `list_head`. The list itself
+  allocates nothing.
+- `remove` walks a pointer to the link (`list_node **`) rather than to the node, so the head
+  needs no special case and the loop is identical at every position.
+- A tail pointer makes `push_back` O(1); `reverse` is the usual three-pointer walk.
 
 ### ring_buffer
 
