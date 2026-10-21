@@ -61,6 +61,20 @@
   受信バッファの確保量をコンパイル時に決めるためのマクロ。
 - 254 バイト目の境界 (コード 0xFF の後ろに暗黙の 0 を入れない) はテストで両側から確認している。
 
+## fixed_point
+
+- Q16.16 (`int32_t`、整数部 16 ビット、小数部 16 ビット)。FPU のないマイコンでセンサ値やフィルタ係数を
+  扱うときの定番で、ここでは浮動小数点を一切使わずに書いています。
+- 演算はすべて飽和 (wrap しない) で、丸めは最近接・同値は 0 から遠い側。DSP の作法に合わせ、
+  オーバーフローで符号が反転する事故を避けます。乗算・除算は 64 ビット中間値で計算します。
+- 負の値の右シフトは C では処理系定義なので、丸めは切り捨て除算 + 剰余の補正で書いています。
+  定数除算なのでコンパイラがシフトに落とし、速度は変わりません。
+- `fx_sqrt` は `v << 16` の整数平方根を 1 桁ずつ求める方式で、結果がそのまま Q16.16 になります。
+  ループは 24 回固定、結果は床。負の入力は 0。
+- 0 除算は符号に合わせて飽和値を返します。テストは既知値に加え、乗除算を 2 万組の乱数で
+  「厳密な有理数との誤差が 0.5 ulp 以内」という整数だけの判定で確かめています (浮動小数点を
+  オラクルにしない)。
+
 ## ring_buffer
 
 - 容量は 2 の冪に限定し、添字の折り返しを剰余ではなくマスクで行う。
@@ -145,6 +159,22 @@ Per-item design notes. One short entry per item, newest at the bottom.
 - `COBS_ENCODE_MAX(n)` is the maximum encoded length (1 for n = 0, otherwise
   n + ceil(n / 254)), for sizing receive buffers at compile time.
 - The 254-byte boundary (no implicit zero after a 0xFF code) is tested from both sides.
+
+### fixed_point
+
+- Q16.16 in an `int32_t`. The usual format for sensor values and filter coefficients on an MCU
+  without an FPU; written here with no floating point at all.
+- Every operation saturates rather than wraps, and rounds to nearest with ties away from zero,
+  as DSP libraries do, so an overflow cannot flip the sign. Multiply and divide use 64-bit
+  intermediates.
+- A right shift of a negative value is implementation-defined in C, so rounding is written as
+  truncating division plus a remainder correction. The divisor is a constant, so the compiler
+  still emits a shift.
+- `fx_sqrt` is a digit-by-digit integer square root of `v << 16`, which lands directly in
+  Q16.16. Fixed 24 iterations, floor result, 0 for negative input.
+- Division by zero saturates by sign. Besides known values, the tests check 20,000 random
+  multiply/divide pairs against the exact rational with an integer-only "within 0.5 ulp" test,
+  so floating point is never the oracle.
 
 ### ring_buffer
 
