@@ -93,9 +93,27 @@ static void test_reverse_and_bswap(void) {
     }
 }
 
+static void test_rotate(void) {
+    MT_CHECK(bt_rotl(0x80000001u, 1) == 0x00000003u);
+    MT_CHECK(bt_rotr(0x00000003u, 1) == 0x80000001u);
+    MT_CHECK(bt_rotl(0x12345678u, 0) == 0x12345678u);
+    MT_CHECK(bt_rotl(0x12345678u, 32) == 0x12345678u);
+    MT_CHECK(bt_rotl(0x12345678u, 8) == 0x34567812u);
+    MT_CHECK(bt_rotr(0x12345678u, 8) == 0x78123456u);
+    uint32_t s = 11;
+    for (int i = 0; i < 100000; i++) {
+        uint32_t v = next(&s);
+        unsigned n = next(&s) % 64;
+        MT_CHECK(bt_rotr(bt_rotl(v, n), n) == v);
+        MT_CHECK(bt_rotl(v, n) == bt_rotr(v, (32 - (n % 32)) % 32));
+        MT_CHECK(bt_popcount(bt_rotl(v, n)) == bt_popcount(v));
+    }
+}
+
 int main(void) {
     MT_RUN(test_pow2);
     MT_RUN(test_counts_match_reference);
     MT_RUN(test_reverse_and_bswap);
+    MT_RUN(test_rotate);
     return mt_report("bit_tricks");
 }

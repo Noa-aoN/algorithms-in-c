@@ -14,5 +14,7 @@ unsigned bt_clz(uint32_t v);
 bool bt_parity(uint32_t v);
 uint32_t bt_reverse(uint32_t v);
 uint32_t bt_bswap(uint32_t v);
+uint32_t bt_rotl(uint32_t v, unsigned n);
+uint32_t bt_rotr(uint32_t v, unsigned n);
 
 #endif
