@@ -26,13 +26,14 @@
 | sorting | [heap_sort](sorting/heap_sort.c) | O(n log n)、追加領域なし | 最悪でも O(n log n)、再帰なし |
 | searching | [binary_search](searching/binary_search.c) | O(log n) | `lower_bound` / `upper_bound` / `find`、重複時は最左 |
 | structures | [ring_buffer](structures/ring_buffer.c) | 1 操作 O(1) | 容量は 2 の冪、フリーランカウンタで満杯と空を区別 |
+| structures | [stack](structures/stack.c) | 1 操作 O(1) | 固定容量、任意の要素サイズ、ストレージは呼び出し側 |
 | bits | [crc32](bits/crc32.c) | O(n) | zlib 互換、逐次更新 API、テーブル版とビット版 |
 | bits | [bit_tricks](bits/bit_tricks.c) | O(1) | popcount / ctz / clz / parity / reverse / bswap / next_pow2 を組み込み関数なしで |
 | encoding | [cobs](encoding/cobs.c) | O(n) | 0x00 を区切りに使うためのバイトスタッフィング。容量と不正入力を検査 |
 | math | [fixed_point](math/fixed_point.c) | 1 演算 O(1) | Q16.16、浮動小数点なし。飽和演算、最近接丸め、整数平方根 |
 | math | [gcd](math/gcd.c) | O(log n) | 二進 GCD (除算なし)、オーバーフロー検査付き LCM、拡張ユークリッド、法逆元 |
 
-予定: linked list、stack / queue、hash table、heap、BST、union-find、BFS / DFS / Dijkstra、KMP。
+予定: linked list、queue、hash table、heap、BST、union-find、BFS / DFS / Dijkstra、KMP。
 
 ## 書き方の約束
 
@@ -83,13 +84,14 @@ microcontroller as is. Same conventions as the sibling [reversi-c](https://githu
 | sorting | [heap_sort](sorting/heap_sort.c) | O(n log n), in place | worst case O(n log n), no recursion |
 | searching | [binary_search](searching/binary_search.c) | O(log n) | `lower_bound` / `upper_bound` / `find`, leftmost on duplicates |
 | structures | [ring_buffer](structures/ring_buffer.c) | O(1) per op | power-of-two capacity, free-running indices |
+| structures | [stack](structures/stack.c) | O(1) per op | fixed capacity, any element size, caller-provided storage |
 | bits | [crc32](bits/crc32.c) | O(n) | zlib-compatible, streaming API, table and bitwise variants |
 | bits | [bit_tricks](bits/bit_tricks.c) | O(1) | popcount / ctz / clz / parity / reverse / bswap / next_pow2 without compiler builtins |
 | encoding | [cobs](encoding/cobs.c) | O(n) | byte stuffing so 0x00 can delimit frames; checks capacity and malformed input |
 | math | [fixed_point](math/fixed_point.c) | O(1) per op | Q16.16 without floating point; saturating, round to nearest, integer square root |
 | math | [gcd](math/gcd.c) | O(log n) | binary GCD (no division), overflow-checked LCM, extended Euclid, modular inverse |
 
-Planned: linked list, stack / queue, hash table, heap, BST, union-find, BFS / DFS / Dijkstra, KMP.
+Planned: linked list, queue, hash table, heap, BST, union-find, BFS / DFS / Dijkstra, KMP.
 
 ### Rules
 

@@ -95,6 +95,12 @@
   収まらないとき 0 を返す (`0x80000001` 以上)。
 - テストは各関数を 1 ビットずつ回す素朴な実装と乱数 10 万件で突き合わせる。
 
+## stack
+
+- 固定容量の LIFO。`init` でストレージ・要素サイズ・容量を受け取り、要素は `memcpy` で出し入れする。
+  `void *` + 要素サイズの形にしたのは、マクロなしでどの型にも使え、`qsort` 系と同じ読み方になるから。
+- 満杯への push と空からの pop は `false`。count だけで状態を持つので満杯と空の曖昧さはない。
+
 ## ring_buffer
 
 - 容量は 2 の冪に限定し、添字の折り返しを剰余ではなくマスクで行う。
@@ -217,6 +223,14 @@ Per-item design notes. One short entry per item, newest at the bottom.
 - `bt_reverse` swaps in 1, 2, 4-bit masks and then byte-swaps. `bt_next_pow2` returns 0 when
   the result does not fit in 32 bits (input above `0x80000000`).
 - Each function is checked against a naive one-bit-at-a-time loop on 100,000 random values.
+
+### stack
+
+- Fixed-capacity LIFO. `init` takes storage, element size and capacity; elements move with
+  `memcpy`. The `void *` plus element size shape works for any type without macros and reads
+  like the `qsort` family.
+- Push on full and pop on empty return `false`. State is a single count, so there is no
+  full/empty ambiguity.
 
 ### ring_buffer
 
