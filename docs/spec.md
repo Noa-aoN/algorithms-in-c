@@ -108,6 +108,13 @@
 - ring_buffer との違いは意図。ring_buffer はバイト専用で生産者 / 消費者がそれぞれ別の変数だけを
   書く (ロックなし SPSC を狙う) のに対し、queue は任意の要素サイズを扱う単一スレッド用の汎用品。
 
+## union_find
+
+- 素集合データ構造。`parent` / `size` の 2 配列は呼び出し側が渡す。
+- `find` は経路半減 (1 つ飛ばしに親をつなぎ直す) で、再帰も 2 回目のループもなしに
+  完全な経路圧縮と同じ償却計算量になる。併合はサイズの小さい方を大きい方の下に付ける。
+- テストは素朴なラベル配列との全組み合わせ比較と、鎖状に併合しても木が平らに保たれることの確認。
+
 ## ring_buffer
 
 - 容量は 2 の冪に限定し、添字の折り返しを剰余ではなくマスクで行う。
@@ -246,6 +253,15 @@ Per-item design notes. One short entry per item, newest at the bottom.
 - The difference from ring_buffer is intent: ring_buffer is byte-only and lets producer and
   consumer write separate variables (aiming at lock-free SPSC), queue is a general
   single-threaded container for any element size.
+
+### union_find
+
+- Disjoint sets. The `parent` and `size` arrays come from the caller.
+- `find` uses path halving (point every other node at its grandparent), which gives the same
+  amortised bound as full path compression without recursion or a second pass. Union attaches
+  the smaller tree under the larger.
+- Tests compare against a naive label array on every pair and check that a chain of unions
+  still leaves a flat tree.
 
 ### ring_buffer
 
