@@ -101,6 +101,13 @@
   `void *` + 要素サイズの形にしたのは、マクロなしでどの型にも使え、`qsort` 系と同じ読み方になるから。
 - 満杯への push と空からの pop は `false`。count だけで状態を持つので満杯と空の曖昧さはない。
 
+## queue
+
+- 固定容量の FIFO (循環配列)。`head + count` で末尾を求めるので容量は 2 の冪でなくてよく、
+  スロットも余らせない。折り返しは剰余ではなく 1 回の比較と減算。
+- ring_buffer との違いは意図。ring_buffer はバイト専用で生産者 / 消費者がそれぞれ別の変数だけを
+  書く (ロックなし SPSC を狙う) のに対し、queue は任意の要素サイズを扱う単一スレッド用の汎用品。
+
 ## ring_buffer
 
 - 容量は 2 の冪に限定し、添字の折り返しを剰余ではなくマスクで行う。
@@ -231,6 +238,14 @@ Per-item design notes. One short entry per item, newest at the bottom.
   like the `qsort` family.
 - Push on full and pop on empty return `false`. State is a single count, so there is no
   full/empty ambiguity.
+
+### queue
+
+- Fixed-capacity FIFO on a circular array. The tail is `head + count`, so any capacity works
+  and no slot is wasted; the wrap is one compare and subtract, not a modulo.
+- The difference from ring_buffer is intent: ring_buffer is byte-only and lets producer and
+  consumer write separate variables (aiming at lock-free SPSC), queue is a general
+  single-threaded container for any element size.
 
 ### ring_buffer
 
