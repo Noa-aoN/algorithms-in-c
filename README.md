@@ -28,9 +28,10 @@
 | structures | [ring_buffer](structures/ring_buffer.c) | 1 操作 O(1) | 容量は 2 の冪、フリーランカウンタで満杯と空を区別 |
 | bits | [crc32](bits/crc32.c) | O(n) | zlib 互換、逐次更新 API、テーブル版とビット版 |
 | encoding | [cobs](encoding/cobs.c) | O(n) | 0x00 を区切りに使うためのバイトスタッフィング。容量と不正入力を検査 |
+| math | [fixed_point](math/fixed_point.c) | 1 演算 O(1) | Q16.16、浮動小数点なし。飽和演算、最近接丸め、整数平方根 |
 
 予定: linked list、stack / queue、hash table、heap、BST、union-find、BFS / DFS / Dijkstra、KMP、
-bit tricks、fixed-point、gcd。
+bit tricks、gcd。
 
 ## 書き方の約束
 
@@ -51,8 +52,9 @@ make clean
 ```
 
 CI は gcc / clang それぞれで通常ビルドと ASan/UBSan ビルドを回し、valgrind でも全テストを通します。
+静的解析 (cppcheck と clang の scan-build) も毎回かけています。
 「マイコンに持っていける」を言葉だけにしないために、Cortex-M4 (Thumb-2) 向けのビルドも CI で毎回通しています。
-全 8 テーマ合わせてコードは 1.5 KB です (`-Os`、CRC テーブルの 1 KB は RAM)。
+全 9 テーマ合わせてコードは 2 KB 弱です (`-Os`、CRC テーブルの 1 KB は RAM)。
 テストはヘッダ 1 つの自作フレームワーク (`tests/minitest.h`) です。
 
 各テーマの設計判断は [docs/spec.md](docs/spec.md) に残しています。
@@ -82,9 +84,10 @@ microcontroller as is. Same conventions as the sibling [reversi-c](https://githu
 | structures | [ring_buffer](structures/ring_buffer.c) | O(1) per op | power-of-two capacity, free-running indices |
 | bits | [crc32](bits/crc32.c) | O(n) | zlib-compatible, streaming API, table and bitwise variants |
 | encoding | [cobs](encoding/cobs.c) | O(n) | byte stuffing so 0x00 can delimit frames; checks capacity and malformed input |
+| math | [fixed_point](math/fixed_point.c) | O(1) per op | Q16.16 without floating point; saturating, round to nearest, integer square root |
 
 Planned: linked list, stack / queue, hash table, heap, BST, union-find, BFS / DFS / Dijkstra, KMP,
-bit tricks, fixed-point, gcd.
+bit tricks, gcd.
 
 ### Rules
 
@@ -102,9 +105,9 @@ make asan
 make cross      # Cortex-M4 build with arm-none-eabi-gcc, prints code size
 ```
 
-CI runs gcc and clang with and without ASan/UBSan, plus valgrind, and a Cortex-M4 (Thumb-2)
-build so the "runs on a microcontroller" claim is checked on every push. All eight items
-together are 1.5 KB of code at `-Os`. Design notes per item are in `docs/spec.md`.
+CI runs gcc and clang with and without ASan/UBSan, valgrind, cppcheck and scan-build, and a
+Cortex-M4 (Thumb-2) build so the "runs on a microcontroller" claim is checked on every push. All nine items
+together are under 2 KB of code at `-Os`. Design notes per item are in `docs/spec.md`.
 
 ### License
 
