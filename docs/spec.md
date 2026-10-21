@@ -93,6 +93,8 @@
   取り出して `popcount(lsb - 1)`。clz は上位へ塗りつぶしてから popcount。
 - `bt_reverse` はマスク交換 (1, 2, 4 ビット) の後にバイト swap。`bt_next_pow2` は 32 ビットに
   収まらないとき 0 を返す (`0x80000001` 以上)。
+- `bt_rotl` / `bt_rotr` はシフト量を 31 でマスクし、0 と 32 でも未定義動作にならない形。この書き方は
+  コンパイラが ROR 1 命令に落とす定石でもある。
 - テストは各関数を 1 ビットずつ回す素朴な実装と乱数 10 万件で突き合わせる。
 
 ## stack
@@ -244,6 +246,8 @@ Per-item design notes. One short entry per item, newest at the bottom.
   counts.
 - `bt_reverse` swaps in 1, 2, 4-bit masks and then byte-swaps. `bt_next_pow2` returns 0 when
   the result does not fit in 32 bits (input above `0x80000000`).
+- `bt_rotl` / `bt_rotr` mask the count with 31 so 0 and 32 are defined; this is also the form
+  compilers recognise and lower to a single ROR.
 - Each function is checked against a naive one-bit-at-a-time loop on 100,000 random values.
 
 ### stack

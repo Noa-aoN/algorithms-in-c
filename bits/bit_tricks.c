@@ -63,3 +63,15 @@ uint32_t bt_reverse(uint32_t v) {
 uint32_t bt_bswap(uint32_t v) {
     return (v >> 24) | ((v >> 8) & 0x0000FF00u) | ((v << 8) & 0x00FF0000u) | (v << 24);
 }
+
+/* Masking n keeps every shift below 32, so n = 0 and n = 32 are defined;
+ * the pattern is what compilers recognise and turn into a single ROR. */
+uint32_t bt_rotl(uint32_t v, unsigned n) {
+    n &= 31u;
+    return (v << n) | (v >> ((32u - n) & 31u));
+}
+
+uint32_t bt_rotr(uint32_t v, unsigned n) {
+    n &= 31u;
+    return (v >> n) | (v << ((32u - n) & 31u));
+}

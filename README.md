@@ -31,7 +31,7 @@
 | structures | [union_find](structures/union_find.c) | ほぼ O(1) (償却) | 経路半減 + サイズによる併合、再帰なし、配列は呼び出し側 |
 | structures | [linked_list](structures/linked_list.c) | 1 操作 O(1)、remove O(n) | 侵入型の単方向リスト。ノードは要素の構造体に埋め込み、確保なし |
 | bits | [crc32](bits/crc32.c) | O(n) | zlib 互換、逐次更新 API、テーブル版とビット版 |
-| bits | [bit_tricks](bits/bit_tricks.c) | O(1) | popcount / ctz / clz / parity / reverse / bswap / next_pow2 を組み込み関数なしで |
+| bits | [bit_tricks](bits/bit_tricks.c) | O(1) | popcount / ctz / clz / parity / reverse / bswap / rotl / rotr / next_pow2 を組み込み関数なしで |
 | encoding | [cobs](encoding/cobs.c) | O(n) | 0x00 を区切りに使うためのバイトスタッフィング。容量と不正入力を検査 |
 | math | [fixed_point](math/fixed_point.c) | 1 演算 O(1) | Q16.16、浮動小数点なし。飽和演算、最近接丸め、整数平方根 |
 | math | [gcd](math/gcd.c) | O(log n) | 二進 GCD (除算なし)、オーバーフロー検査付き LCM、拡張ユークリッド、法逆元 |
@@ -59,7 +59,7 @@ make clean
 CI は gcc / clang それぞれで通常ビルドと ASan/UBSan ビルドを回し、valgrind でも全テストを通します。
 静的解析 (cppcheck と clang の scan-build) も毎回かけています。
 「マイコンに持っていける」を言葉だけにしないために、Cortex-M4 (Thumb-2) 向けのビルドも CI で毎回通しています。
-全 11 テーマ合わせてコードは約 2.5 KB です (`-Os`、CRC テーブルの 1 KB は RAM)。
+全 15 テーマ合わせてコードは約 3.4 KB です (`-Os`、CRC テーブルの 1 KB は RAM)。
 テストはヘッダ 1 つの自作フレームワーク (`tests/minitest.h`) です。
 
 各テーマの設計判断は [docs/spec.md](docs/spec.md) に残しています。
@@ -92,7 +92,7 @@ microcontroller as is. Same conventions as the sibling [reversi-c](https://githu
 | structures | [union_find](structures/union_find.c) | near O(1) amortised | path halving + union by size, no recursion, caller-provided arrays |
 | structures | [linked_list](structures/linked_list.c) | O(1) per op, O(n) remove | intrusive singly linked list; the node lives in the element, no allocation |
 | bits | [crc32](bits/crc32.c) | O(n) | zlib-compatible, streaming API, table and bitwise variants |
-| bits | [bit_tricks](bits/bit_tricks.c) | O(1) | popcount / ctz / clz / parity / reverse / bswap / next_pow2 without compiler builtins |
+| bits | [bit_tricks](bits/bit_tricks.c) | O(1) | popcount / ctz / clz / parity / reverse / bswap / rotl / rotr / next_pow2 without compiler builtins |
 | encoding | [cobs](encoding/cobs.c) | O(n) | byte stuffing so 0x00 can delimit frames; checks capacity and malformed input |
 | math | [fixed_point](math/fixed_point.c) | O(1) per op | Q16.16 without floating point; saturating, round to nearest, integer square root |
 | math | [gcd](math/gcd.c) | O(log n) | binary GCD (no division), overflow-checked LCM, extended Euclid, modular inverse |
@@ -116,8 +116,8 @@ make cross      # Cortex-M4 build with arm-none-eabi-gcc, prints code size
 ```
 
 CI runs gcc and clang with and without ASan/UBSan, valgrind, cppcheck and scan-build, and a
-Cortex-M4 (Thumb-2) build so the "runs on a microcontroller" claim is checked on every push. All eleven items
-together are about 2.5 KB of code at `-Os`. Design notes per item are in `docs/spec.md`.
+Cortex-M4 (Thumb-2) build so the "runs on a microcontroller" claim is checked on every push. All fifteen items
+together are about 3.4 KB of code at `-Os`. Design notes per item are in `docs/spec.md`.
 
 ### License
 
